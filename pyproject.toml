@@ -32,7 +32,8 @@ dev = ["pytest>=8"]
 tablesight = "tablesight.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/Kavyatolety"
+Homepage = "https://github.com/Kavyatolety/tablesight"
+Repository = "https://github.com/Kavyatolety/tablesight"
 
 [tool.setuptools.packages.find]
 where = ["src"]

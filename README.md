@@ -1,5 +1,7 @@
 # TableSight
 
+[![Tests](https://github.com/Kavyatolety/tablesight/actions/workflows/tests.yml/badge.svg)](https://github.com/Kavyatolety/tablesight/actions/workflows/tests.yml)
+
 Extract tables and figures from PDFs as clean, structured chunks that any RAG pipeline can ingest.
 
 By [Kavya Tolety](https://github.com/Kavyatolety)
