@@ -248,17 +248,50 @@ def extract_figures_from_page(
     return chunks
 
 
-def extract_pdf(path: str | Path) -> list[Chunk]:
-    """Extract every table and figure chunk from one PDF."""
+def _covers_most_of_page(
+    chunk: Chunk, page: "pymupdf.Page", fraction: float = 0.9
+) -> bool:
+    """True when a chunk bbox covers nearly the whole page.
+
+    On a scanned page the single embedded image is the scan itself, not
+    a figure, so its figure chunk is dropped when OCR runs on the page.
+    """
+    if not chunk.bbox:
+        return False
+    x0, y0, x1, y1 = chunk.bbox
+    area = max(0.0, x1 - x0) * max(0.0, y1 - y0)
+    return area >= fraction * page.rect.width * page.rect.height
+
+
+def extract_pdf(path: str | Path, ocr: bool = False) -> list[Chunk]:
+    """Extract every table and figure chunk from one PDF.
+
+    With ocr=True, pages that have no usable text layer and no detected
+    table are routed through the OCR fallback in tablesight.ocr, which
+    needs the optional dependencies (pip install tablesight[ocr]).
+    Without it, scanned pages behave exactly as they did in v0.1.
+    """
     pdf_path = Path(path)
     source_file = pdf_path.name
     chunks: list[Chunk] = []
     with pymupdf.open(pdf_path) as doc:
         for page in doc:
             blocks = _text_blocks(page)
-            chunks.extend(extract_tables_from_page(page, source_file, blocks))
-            chunks.extend(extract_figures_from_page(page, source_file, blocks))
-    chunks.sort(key=lambda c: (c.page, 0 if c.type == "table" else 1))
+            tables = extract_tables_from_page(page, source_file, blocks)
+            figures = extract_figures_from_page(page, source_file, blocks)
+            chunks.extend(tables)
+            if ocr and not tables and len(page.get_text("text").strip()) < 20:
+                from .ocr import ocr_page_chunks
+
+                chunks.extend(ocr_page_chunks(page, source_file))
+                figures = [
+                    figure
+                    for figure in figures
+                    if not _covers_most_of_page(figure, page)
+                ]
+            chunks.extend(figures)
+    type_order = {"table": 0, "figure": 1, "text": 2}
+    chunks.sort(key=lambda c: (c.page, type_order.get(c.type, 3)))
     return chunks
 
 

@@ -3,6 +3,6 @@
 from .extract import extract_pdf, write_jsonl
 from .schema import Chunk
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __author__ = "Kavya Tolety"
 __all__ = ["Chunk", "extract_pdf", "write_jsonl", "__version__"]

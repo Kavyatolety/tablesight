@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tablesight"
-version = "0.1.0"
+version = "0.2.0"
 description = "Extract tables and figures from PDFs as clean, structured chunks for RAG pipelines."
 readme = "README.md"
 license = { text = "MIT" }
@@ -26,7 +26,8 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+ocr = ["rapidocr-onnxruntime>=1.3", "numpy>=1.24"]
+dev = ["pytest>=8", "rapidocr-onnxruntime>=1.3", "numpy>=1.24"]
 
 [project.scripts]
 tablesight = "tablesight.cli:main"

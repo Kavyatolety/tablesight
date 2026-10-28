@@ -18,12 +18,16 @@ class Chunk:
     Attributes:
         source_file: Base name of the source PDF, for example paper.pdf.
         page: 1-based page number in the source PDF.
-        type: Either table or figure.
+        type: Table, figure, or text. Text chunks are emitted only by
+            the OCR fallback, for a scanned page whose OCR output did
+            not form a table grid.
         content_markdown: Markdown rendering of the chunk. For a table
             this is a Markdown table built from the extracted rows.
             For a figure this is the caption plus basic image metadata.
+            For a text chunk this is the OCR text in reading order.
         rows: Structured cell data for tables, as a list of rows where
-            each row is a list of cell strings. None for figures.
+            each row is a list of cell strings. None for figures and
+            text chunks.
         caption: Caption text linked to the chunk where one was found
             near it on the page. None when no caption was found.
         source_text_span: Raw text recovered from the chunk region

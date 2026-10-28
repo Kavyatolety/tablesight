@@ -29,6 +29,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Also print a short summary of each chunk to stdout.",
     )
+    extract_parser.add_argument(
+        "--ocr",
+        action="store_true",
+        help="Run OCR on scanned, image-only pages (needs: pip install tablesight[ocr]).",
+    )
     return parser
 
 
@@ -40,13 +45,18 @@ def main(argv: list[str] | None = None) -> int:
         if not pdf_path.is_file():
             print(f"Error: PDF not found: {pdf_path}", file=sys.stderr)
             return 2
-        chunks = extract_pdf(pdf_path)
+        try:
+            chunks = extract_pdf(pdf_path, ocr=args.ocr)
+        except ImportError as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 2
         count = write_jsonl(chunks, args.out)
         tables = sum(1 for c in chunks if c.type == "table")
         figures = sum(1 for c in chunks if c.type == "figure")
+        texts = sum(1 for c in chunks if c.type == "text")
         print(
-            f"Wrote {count} chunks ({tables} tables, {figures} figures) "
-            f"from {pdf_path.name} to {args.out}"
+            f"Wrote {count} chunks ({tables} tables, {figures} figures, "
+            f"{texts} text) from {pdf_path.name} to {args.out}"
         )
         if args.pretty:
             for chunk in chunks:
