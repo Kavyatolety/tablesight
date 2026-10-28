@@ -5,3 +5,7 @@ __pycache__/
 *.egg-info/
 dist/
 build/
+
+# Local working drafts, never part of the package
+launch-drafts-*.md
+.venvs/
